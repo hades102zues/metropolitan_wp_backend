@@ -13,11 +13,46 @@ declare(strict_types = 1);
  */
 
 
+ function cleaned($postTitle) {
+        //cleaning process to get a clean hypenated title cleaned of any special characters
+        $cleanStep1 = str_replace(".","",$postTitle);
+        $cleanStep2 = str_replace("!","",$cleanStep1);
+        $cleanStep3 = str_replace("?","",$cleanStep2);
+        $cleanStep4 = str_replace("(","",$cleanStep3);
+        $cleanStep5 = str_replace(")","",$cleanStep4);
+        $cleanStep6 = str_replace("@","",$cleanStep5);
+        $cleanStep7 = str_replace("&","",$cleanStep6);
+        $cleanStep8 = str_replace("#","",$cleanStep7);
+        $cleanStep9 = str_replace("$","",$cleanStep8);
+        $cleanStep10 = str_replace("\"","",$cleanStep9);
+        $cleanStep11 = str_replace("'","",$cleanStep10);
+        $cleanStep12 = str_replace(":","",$cleanStep11);
+        $cleanStep13 = str_replace(";","",$cleanStep12);
+        $cleanStep14 = str_replace(">","",$cleanStep13);
+        $cleanStep15 = str_replace("<","",$cleanStep14);
+        $cleanStep16 = str_replace("[","",$cleanStep15);
+        $cleanStep17 = str_replace("]","",$cleanStep16);
+        $cleanStep18 = str_replace("%","",$cleanStep17);
+        $cleanStep19 = str_replace("\\","",$cleanStep18);
+        $cleanStep20 = str_replace("|","",$cleanStep19);
+        $cleanStep21 = str_replace("-","",$cleanStep20);
+        $cleanStep22 = str_replace("+","",$cleanStep21);
+        $cleanStep23 = str_replace("_","",$cleanStep22);
+        $cleanStep24 = str_replace("=","",$cleanStep23);
+        $cleanStep25 = str_replace("*","",$cleanStep24);
+        $cleanStep26 = str_replace("^","",$cleanStep25);
+
+        $cleanStep27 = trim(preg_replace('/\s\s+/', ' ', str_replace("\n", " ", $cleanStep26))); //leaves only a single space between words
+        $cleanStep28 = str_replace(" ","-",$cleanStep27);
+        $cleanStep29 = strtolower($cleanStep28);
+
+        return $cleanStep29;
+ }
+
 function getPost($params) {
   
 
     $hyphenatedPostTitle = $params["title"]; //single word and sometimes a hypenated word
-    $cleanedPageTitle = strtolower(str_replace("-", " ",$hyphenatedPostTitle ));
 
     
     $args = array(
@@ -35,17 +70,18 @@ function getPost($params) {
  
     foreach ($posts as $post){
 
-            //dont use the post_name
-            //It is only updated at the time the post is first published.
-            //Hence it does not change along side the post title
+            
+            
+            $proposedMatch = cleaned($post->post_title);
 
-            if(strcmp($cleanedPageTitle,  strtolower($post->post_title)) == 0){
+            if(strcmp($hyphenatedPostTitle,  strtolower($proposedMatch)) == 0){
 
                 $matchedPost["title"] = $post->post_title;
                 $matchedPost["date"] = date('F m, Y', strtotime($post->post_date) );
                 $matchedPost['featured_image_url'] = get_the_post_thumbnail_url($post->ID, 'Large') ? get_the_post_thumbnail_url($post->ID, 'medium') : ""; 
                 $matchedPost["content"] = $post->post_content;
-
+                $matchedPost["excerpt"] = $post->post_excerpt;
+                $matchedPost["postExist"] = true;
                 
                 $res = new WP_REST_Response (array(
                     'post' => $matchedPost
@@ -59,9 +95,16 @@ function getPost($params) {
             }
     }
 
+    
+    $matchedPost["title"] = "";
+    $matchedPost["date"] = "";
+    $matchedPost['featured_image_url'] = ""; 
+    $matchedPost["content"] = "";
+    $matchedPost["excerpt"] = "";
+    $matchedPost["postExist"] = false;
 
     $res = new WP_REST_Response (array(
-        "server_message" => "Post not found."
+        'post' => $matchedPost
     ));
 
     $res->set_status(404);
@@ -106,13 +149,17 @@ function getPost($params) {
     $i = 0;
 
     foreach ($posts as $post){
+
+        
+        $punctuatedCleanedTitle = cleaned($post->post_title);
+        
         $postList[$i]['id'] = $post->ID;
         $postList[$i]['title'] = $post->post_title;
         $postList[$i]['author'] = $post->post_author;
         $postList[$i]['date'] = date('F m, Y', strtotime($post->post_date) );
         $postList[$i]['excerpt'] =$post->post_excerpt;
         $postList[$i]['featured_image_url'] = get_the_post_thumbnail_url($post->ID, 'Large') ? get_the_post_thumbnail_url($post->ID, 'medium') : ""; //featured image
-
+        $postList[$i]['url_cleaned_title'] = $punctuatedCleanedTitle;
         $i++;
     }
 
