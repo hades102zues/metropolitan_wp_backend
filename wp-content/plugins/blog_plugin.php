@@ -1,8 +1,7 @@
 <?php 
 
 declare(strict_types = 1);
-define( 'WP_DEBUG_LOG', true );
-define( 'WP_DEBUG_DISPLAY', false );
+
 
 
 /**
@@ -43,15 +42,34 @@ function getPost($params) {
             if(strcmp($cleanedPageTitle,  strtolower($post->post_title)) == 0){
 
                 $matchedPost["title"] = $post->post_title;
-                $matchedPost["date"] = $post->post_date;
+                $matchedPost["date"] = date('F m, Y', strtotime($post->post_date) );
                 $matchedPost["content"] = $post->post_content;
 
+                
+                $res = new WP_REST_Response (array(
+                    'post' => $matchedPost
+                ));
 
+                $res->set_status(200);
+                
+                
+                return  $res;
+           
             }
     }
 
 
-    return $matchedPost;
+    $res = new WP_REST_Response (array(
+        "server_message" => "Post not found."
+    ));
+
+    $res->set_status(404);
+    
+    
+    return  $res;
+
+
+
  
   }
  
@@ -80,6 +98,8 @@ function getPost($params) {
 
     $query = new WP_Query($args);
     $posts = $query->posts;
+    $maxNumPost = $query->max_num_pages;
+
 
     $postList = array();
     $i = 0;
@@ -88,18 +108,24 @@ function getPost($params) {
         $postList[$i]['id'] = $post->ID;
         $postList[$i]['title'] = $post->post_title;
         $postList[$i]['author'] = $post->post_author;
-        $postList[$i]['date'] = $post->post_date;
+        $postList[$i]['date'] = date('F m, Y', strtotime($post->post_date) );
         $postList[$i]['excerpt'] =$post->post_excerpt;
         $postList[$i]['image_url'] = get_the_post_thumbnail_url($post->ID, 'Large') ? get_the_post_thumbnail_url($post->ID, 'medium') : ""; //featured image
 
         $i++;
     }
 
-    $res = array(
-        'posts'=>$postList
-    );
+    $res = new WP_REST_Response (array(
+        'posts'=> $postList,
+        'maxNumPages' => $maxNumPost
+   
+    ));
 
-    return $res;
+    $res->set_status(200);
+      
+
+ 
+    return  $res;
 
 
  }
