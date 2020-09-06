@@ -43,6 +43,7 @@ function getPost($params) {
 
                 $matchedPost["title"] = $post->post_title;
                 $matchedPost["date"] = date('F m, Y', strtotime($post->post_date) );
+                $matchedPost['featured_image_url'] = get_the_post_thumbnail_url($post->ID, 'Large') ? get_the_post_thumbnail_url($post->ID, 'medium') : ""; 
                 $matchedPost["content"] = $post->post_content;
 
                 
@@ -110,7 +111,7 @@ function getPost($params) {
         $postList[$i]['author'] = $post->post_author;
         $postList[$i]['date'] = date('F m, Y', strtotime($post->post_date) );
         $postList[$i]['excerpt'] =$post->post_excerpt;
-        $postList[$i]['image_url'] = get_the_post_thumbnail_url($post->ID, 'Large') ? get_the_post_thumbnail_url($post->ID, 'medium') : ""; //featured image
+        $postList[$i]['featured_image_url'] = get_the_post_thumbnail_url($post->ID, 'Large') ? get_the_post_thumbnail_url($post->ID, 'medium') : ""; //featured image
 
         $i++;
     }
