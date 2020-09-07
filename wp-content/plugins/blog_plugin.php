@@ -71,19 +71,19 @@ function getPost($params) {
     foreach ($posts as $post){
 
             
-            
-            $proposedMatch = cleaned($post->post_title);
+            $urlReadyTitle = cleaned($post->post_title);
+            $proposedMatch = $urlReadyTitle;
 
             if(strcmp($hyphenatedPostTitle,  strtolower($proposedMatch)) == 0){
 
-                $matchedPost['content'] =  get_post_meta($post->ID, "body", true);
+               
                 $matchedPost["title"] = $post->post_title;
                 $matchedPost["date"] = date('F m, Y', strtotime($post->post_date) );
                 $matchedPost['featured_image_url'] = get_the_post_thumbnail_url($post->ID, 'medium') ? get_the_post_thumbnail_url($post->ID, 'medium') : ""; 
                 $matchedPost["content"] = $post->post_content;
-                //$matchedPost["content"] = parse_blocks($post->post_content);
+                $matchedPost['url_cleaned_title'] = $urlReadyTitle;
                 $matchedPost["excerpt"] = $post->post_excerpt;
-                $matchedPost["postExist"] = true;
+               // $matchedPost["postExist"] = true;
                 
                 $res = new WP_REST_Response (array(
                     'post' => $matchedPost
@@ -103,7 +103,7 @@ function getPost($params) {
     $matchedPost['featured_image_url'] = ""; 
     $matchedPost["content"] = "";
     $matchedPost["excerpt"] = "";
-    $matchedPost["postExist"] = false;
+    //$matchedPost["postExist"] = false;
 
     $res = new WP_REST_Response (array(
         'post' => $matchedPost
@@ -153,7 +153,7 @@ function getPost($params) {
     foreach ($posts as $post){
 
         
-        $punctuatedCleanedTitle = cleaned($post->post_title);
+        $urlReadyTitle = cleaned($post->post_title);
         
         $postList[$i]['id'] = $post->ID;
         $postList[$i]['title'] = $post->post_title;
@@ -161,7 +161,7 @@ function getPost($params) {
         $postList[$i]['date'] = date('F m, Y', strtotime($post->post_date) );
         $postList[$i]['excerpt'] =$post->post_excerpt;
         $postList[$i]['featured_image_url'] = get_the_post_thumbnail_url($post->ID, 'Large') ? get_the_post_thumbnail_url($post->ID, 'medium') : ""; //featured image
-        $postList[$i]['url_cleaned_title'] = $punctuatedCleanedTitle;
+        $postList[$i]['url_cleaned_title'] = $urlReadyTitle;
         $i++;
     }
 
