@@ -75,11 +75,16 @@ function getPost($params) {
             $proposedMatch = $urlReadyTitle;
 
             if(strcmp($hyphenatedPostTitle,  strtolower($proposedMatch)) == 0){
-
+                $featuredImage = get_the_post_thumbnail_url($post->ID, 'medium') ? get_the_post_thumbnail_url($post->ID, 'medium') : "";
+                if(strlen($featuredImage) > 1){
+                    $split1 = explode('/wp-content',$featuredImage);
+                    $featuredImage = $split1[1];
+                }
                
                 $matchedPost["title"] = $post->post_title;
+                $matchedPost["test"] = $featuredImage;
                 $matchedPost["date"] = date('F m, Y', strtotime($post->post_date) );
-                $matchedPost['featured_image_url'] = get_the_post_thumbnail_url($post->ID, 'medium') ? get_the_post_thumbnail_url($post->ID, 'medium') : ""; 
+                $matchedPost['featured_image_url'] = $featuredImage; 
                 $matchedPost["content"] = $post->post_content;
                 $matchedPost['url_cleaned_title'] = $urlReadyTitle;
                 $matchedPost["excerpt"] = $post->post_excerpt;
@@ -154,13 +159,19 @@ function getPost($params) {
 
         
         $urlReadyTitle = cleaned($post->post_title);
+        $featuredImage = get_the_post_thumbnail_url($post->ID, 'medium') ? get_the_post_thumbnail_url($post->ID, 'medium') : "";
+        if(strlen($featuredImage) > 1){
+            $split1 = explode('/wp-content',$featuredImage);
+            $featuredImage = $split1[1]; //  E.g     /uploads/20/09/ima.png
+        }
+       
         
         $postList[$i]['id'] = $post->ID;
         $postList[$i]['title'] = $post->post_title;
         $postList[$i]['author'] = $post->post_author;
         $postList[$i]['date'] = date('F m, Y', strtotime($post->post_date) );
         $postList[$i]['excerpt'] =$post->post_excerpt;
-        $postList[$i]['featured_image_url'] = get_the_post_thumbnail_url($post->ID, 'Large') ? get_the_post_thumbnail_url($post->ID, 'medium') : ""; //featured image
+        $postList[$i]['featured_image_url'] = $featuredImage; //featured image
         $postList[$i]['url_cleaned_title'] = $urlReadyTitle;
         $i++;
     }
