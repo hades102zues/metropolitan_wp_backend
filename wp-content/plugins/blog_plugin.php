@@ -76,10 +76,12 @@ function getPost($params) {
 
             if(strcmp($hyphenatedPostTitle,  strtolower($proposedMatch)) == 0){
 
+                $matchedPost['content'] =  get_post_meta($post->ID, "body", true);
                 $matchedPost["title"] = $post->post_title;
                 $matchedPost["date"] = date('F m, Y', strtotime($post->post_date) );
                 $matchedPost['featured_image_url'] = get_the_post_thumbnail_url($post->ID, 'Large') ? get_the_post_thumbnail_url($post->ID, 'medium') : ""; 
-                $matchedPost["content"] = $post->post_content;
+               // $matchedPost["content"] = $post->post_content;
+                //$matchedPost["content"] = parse_blocks($post->post_content);
                 $matchedPost["excerpt"] = $post->post_excerpt;
                 $matchedPost["postExist"] = true;
                 
