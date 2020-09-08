@@ -74,32 +74,69 @@ function getPost($params) {
             $urlReadyTitle = cleaned($post->post_title);
             $proposedMatch = $urlReadyTitle;
 
-            if(strcmp($hyphenatedPostTitle,  strtolower($proposedMatch)) == 0){
-                $featuredImage = get_the_post_thumbnail_url($post->ID, 'medium') ? get_the_post_thumbnail_url($post->ID, 'medium') : "";
-                if(strlen($featuredImage) > 1){
-                    $split1 = explode('/wp-content',$featuredImage);
-                    $featuredImage = $split1[1];
+            $revealPost = get_post_meta($post->ID, "show", true); //flag which determines if a post should appear on the website.
+
+           
+                if(strcmp($hyphenatedPostTitle,  strtolower($proposedMatch)) == 0){
+
+                    if(strcmp($revealPost,"1")==0) {
+
+
+                        $featuredImage = get_the_post_thumbnail_url($post->ID, 'medium') ? get_the_post_thumbnail_url($post->ID, 'medium') : "";
+                        if(strlen($featuredImage) > 1){
+                            $split1 = explode('/wp-content',$featuredImage);
+                            $featuredImage = $split1[1];
+                        }
+                       
+                        $matchedPost["title"] = $post->post_title;
+                     
+                        $matchedPost["date"] = date('F m, Y', strtotime($post->post_date) );
+                        $matchedPost['featured_image_url'] = get_the_post_thumbnail_url($post->ID, 'medium') ? get_the_post_thumbnail_url($post->ID, 'medium') : ""; 
+                       // $matchedPost['featured_image_url'] = $featuredImage; 
+                        $matchedPost["content"] = $post->post_content;
+                        $matchedPost['url_cleaned_title'] = $urlReadyTitle;
+                        $matchedPost["excerpt"] = $post->post_excerpt;
+                        //$matchedPost["postToBeRevealed"] = true;
+    
+                    
+                       // $matchedPost["postExist"] = true;
+                        
+                        $res = new WP_REST_Response (array(
+                            'post' => $matchedPost,
+                            'goodObject' => true
+                        ));
+        
+                        $res->set_status(200); 
+                        
+                        
+                        return  $res;
+
+                    }
+                    else {
+                        $matchedPost["title"] = "";
+                        $matchedPost["date"] = "";
+                        $matchedPost['featured_image_url'] = ""; 
+                        $matchedPost["content"] = "";
+                        $matchedPost["excerpt"] = "";
+                        //$matchedPost["postToBeRevealed"] = false;
+
+                        $res = new WP_REST_Response (array(
+                            'post' => $matchedPost,
+                            'goodObject' => false
+                        ));
+        
+                        $res->set_status(410);
+                        
+                        
+                        return  $res;
+                    }
+                  
                 }
                
-                $matchedPost["title"] = $post->post_title;
-                $matchedPost["test"] = $featuredImage;
-                $matchedPost["date"] = date('F m, Y', strtotime($post->post_date) );
-                $matchedPost['featured_image_url'] = $featuredImage; 
-                $matchedPost["content"] = $post->post_content;
-                $matchedPost['url_cleaned_title'] = $urlReadyTitle;
-                $matchedPost["excerpt"] = $post->post_excerpt;
-               // $matchedPost["postExist"] = true;
-                
-                $res = new WP_REST_Response (array(
-                    'post' => $matchedPost
-                ));
+            
 
-                $res->set_status(200);
-                
-                
-                return  $res;
-           
-            }
+            
+            
     }
 
     
@@ -108,10 +145,11 @@ function getPost($params) {
     $matchedPost['featured_image_url'] = ""; 
     $matchedPost["content"] = "";
     $matchedPost["excerpt"] = "";
-    //$matchedPost["postExist"] = false;
+   // $matchedPost["postToBeRevealed"] = false;
 
     $res = new WP_REST_Response (array(
-        'post' => $matchedPost
+        'post' => $matchedPost,
+        'goodObject' => false
     ));
 
     $res->set_status(404);
@@ -165,14 +203,22 @@ function getPost($params) {
             $featuredImage = $split1[1]; //  E.g     /uploads/20/09/ima.png
         }
        
-        
-        $postList[$i]['id'] = $post->ID;
-        $postList[$i]['title'] = $post->post_title;
-        $postList[$i]['author'] = $post->post_author;
-        $postList[$i]['date'] = date('F m, Y', strtotime($post->post_date) );
-        $postList[$i]['excerpt'] =$post->post_excerpt;
-        $postList[$i]['featured_image_url'] = $featuredImage; //featured image
-        $postList[$i]['url_cleaned_title'] = $urlReadyTitle;
+         $revealPost = get_post_meta($post->ID, "show", true); //flag which determines if a post should appear on the website.
+
+        if(strcmp($revealPost,"1")==0) {
+            $postList[$i]['id'] = $post->ID;
+            $postList[$i]['title'] = $post->post_title;
+            $postList[$i]['author'] = $post->post_author;
+            $postList[$i]['date'] = date('F m, Y', strtotime($post->post_date) );
+            $postList[$i]['excerpt'] =$post->post_excerpt;
+           // $postList[$i]['featured_image_url'] = $featuredImage; //featured image
+           $postList[$i]['featured_image_url'] = get_the_post_thumbnail_url($post->ID, 'medium') ? get_the_post_thumbnail_url($post->ID, 'medium') : "";
+            $postList[$i]['url_cleaned_title'] = $urlReadyTitle;
+        }
+      
+       
+
+
         $i++;
     }
 
