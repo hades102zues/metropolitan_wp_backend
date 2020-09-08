@@ -190,7 +190,7 @@ function getPost($params) {
     $maxNumPost = $query->max_num_pages;
 
 
-    $postList = array();
+    $postList = array(); //an empty array always defaults to []
     $i = 0;
 
     foreach ($posts as $post){
@@ -206,18 +206,29 @@ function getPost($params) {
          $revealPost = get_post_meta($post->ID, "show", true); //flag which determines if a post should appear on the website.
 
         if(strcmp($revealPost,"1")==0) {
-            $postList[$i]['id'] = $post->ID;
-            $postList[$i]['title'] = $post->post_title;
-            $postList[$i]['author'] = $post->post_author;
-            $postList[$i]['date'] = date('F m, Y', strtotime($post->post_date) );
-            $postList[$i]['excerpt'] =$post->post_excerpt;
-           // $postList[$i]['featured_image_url'] = $featuredImage; //featured image
-           $postList[$i]['featured_image_url'] = get_the_post_thumbnail_url($post->ID, 'medium') ? get_the_post_thumbnail_url($post->ID, 'medium') : "";
-            $postList[$i]['url_cleaned_title'] = $urlReadyTitle;
+            $postObj = array(
+                'id' => $post->ID,
+                'title' => $post->post_title,
+                'author' => $post->post_author,
+                'date' => date('F m, Y', strtotime($post->post_date) ),
+                'excerpt' => $post->post_excerpt,
+                'featured_image_url' => get_the_post_thumbnail_url($post->ID, 'medium') ? get_the_post_thumbnail_url($post->ID, 'medium') : "",
+                'url_cleaned_title' => $urlReadyTitle
+            );
+        //     $postList[$i]['id'] = $post->ID;
+        //     $postList[$i]['title'] = $post->post_title;
+        //     $postList[$i]['author'] = $post->post_author;
+        //     $postList[$i]['date'] = date('F m, Y', strtotime($post->post_date) );
+        //     $postList[$i]['excerpt'] =$post->post_excerpt;
+        //    // $postList[$i]['featured_image_url'] = $featuredImage; //featured image
+        //    $postList[$i]['featured_image_url'] = get_the_post_thumbnail_url($post->ID, 'medium') ? get_the_post_thumbnail_url($post->ID, 'medium') : "";
+        //     $postList[$i]['url_cleaned_title'] = $urlReadyTitle;
+        //$postList[$i] = $postObj;
+        array_push($postList, $postObj); //push is the only way of insuring that we are building an indexed array
         }
       
        
-
+        
 
         $i++;
     }
