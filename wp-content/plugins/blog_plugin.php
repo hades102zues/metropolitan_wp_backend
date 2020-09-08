@@ -49,6 +49,11 @@ declare(strict_types = 1);
         return $cleanStep29;
  }
 
+
+
+
+
+
 function getPost($params) {
   
 
@@ -81,7 +86,8 @@ function getPost($params) {
 
                     if(strcmp($revealPost,"1")==0) {
 
-
+                         // we use the following to get the path under wp-content
+                         //this is necessary when it comes to production, where the wordpress site will not be located at root
                         $featuredImage = get_the_post_thumbnail_url($post->ID, 'medium') ? get_the_post_thumbnail_url($post->ID, 'medium') : "";
                         if(strlen($featuredImage) > 1){
                             $split1 = explode('/wp-content',$featuredImage);
@@ -91,8 +97,12 @@ function getPost($params) {
                         $matchedPost["title"] = $post->post_title;
                      
                         $matchedPost["date"] = date('F m, Y', strtotime($post->post_date) );
-                        $matchedPost['featured_image_url'] = get_the_post_thumbnail_url($post->ID, 'medium') ? get_the_post_thumbnail_url($post->ID, 'medium') : ""; 
-                       // $matchedPost['featured_image_url'] = $featuredImage; 
+
+                        //Must be changed in production
+                        //$matchedPost['featured_image_url'] = get_the_post_thumbnail_url($post->ID, 'medium') ? get_the_post_thumbnail_url($post->ID, 'medium') : ""; 
+                         $matchedPost['featured_image_url'] = $featuredImage; 
+
+
                         $matchedPost["content"] = $post->post_content;
                         $matchedPost['url_cleaned_title'] = $urlReadyTitle;
                         $matchedPost["excerpt"] = $post->post_excerpt;
@@ -197,6 +207,9 @@ function getPost($params) {
 
         
         $urlReadyTitle = cleaned($post->post_title);
+
+        // we use the following to get the path under wp-content
+        //this is necessary when it comes to production, where the wordpress site will not be located at root
         $featuredImage = get_the_post_thumbnail_url($post->ID, 'medium') ? get_the_post_thumbnail_url($post->ID, 'medium') : "";
         if(strlen($featuredImage) > 1){
             $split1 = explode('/wp-content',$featuredImage);
@@ -212,7 +225,8 @@ function getPost($params) {
                 'author' => $post->post_author,
                 'date' => date('F m, Y', strtotime($post->post_date) ),
                 'excerpt' => $post->post_excerpt,
-                'featured_image_url' => get_the_post_thumbnail_url($post->ID, 'medium') ? get_the_post_thumbnail_url($post->ID, 'medium') : "",
+                 'featured_image_url' => $featuredImage,
+                //'featured_image_url' => get_the_post_thumbnail_url($post->ID, 'medium') ? get_the_post_thumbnail_url($post->ID, 'medium') : "",
                 'url_cleaned_title' => $urlReadyTitle
             );
         //     $postList[$i]['id'] = $post->ID;
