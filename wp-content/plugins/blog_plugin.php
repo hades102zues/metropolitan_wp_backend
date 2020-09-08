@@ -178,7 +178,7 @@ function getPost($params) {
 
     $args = array(
         'post_type' => 'custom_posts',
-        'post_per_page' => 10,
+        'posts_per_page' => 10, //controls the amount of posts per page
         'order' => 'DSC',
         'orderby' => 'date',
         'paged' => $pageNumber
