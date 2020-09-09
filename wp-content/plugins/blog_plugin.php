@@ -50,9 +50,96 @@ declare(strict_types = 1);
  }
 
 
+ function getAnnouncement() {
+  
+
+    $args = array(
+        'post_type' => 'announcement',
+        'order' => 'DSC',
+        'orderby' => 'date'
+    );
+   
+    $query = new WP_Query($args);
+    $posts = $query->posts;
+ 
+   
+    $announcment = array();
+
+    foreach ($posts as $post){
+
+        $revealPost = get_post_meta($post->ID, "show", true); //flag which determines if a post should appear on the website.
+
+        if(strcmp($revealPost,"1")==0) {
+            
+            $featuredImage = get_the_post_thumbnail_url($post->ID, 'large') ? get_the_post_thumbnail_url($post->ID, 'large') : "";
+            if(strlen($featuredImage) > 1){
+                $split1 = explode('/wp-content',$featuredImage);
+                $featuredImage = $split1[1];
+            }
+
+            $announcment['featured_image_url'] = $featuredImage;
+               
+            $res = new WP_REST_Response (array(
+                'announcement' => $announcment,
+                'goodObject' => true
+            ));
+
+            $res->set_status(200); 
+            
+            
+            return  $res;
+
+
+        }
+        else {
+            //return default object
+            $announcment['featured_image_url'] = "";
+            $res = new WP_REST_Response (array(
+                'announcement' => $announcment,
+                'goodObject' => false
+            ));
+
+            $res->set_status(410); 
+            return  $res;
+        }
+
+        break;// we only want the latest announcement  
+               
+
+            
+            
+    }
+
+ 
+   
+    
+ //return default object
+ $announcment['featured_image_url'] = "";
+ $res = new WP_REST_Response (array(
+     'announcement' => $announcment,
+     'goodObject' => false
+ ));
+
+ $res->set_status(4); 
+ return  $res;
+    
+  }
 
 
 
+
+ add_action('rest_api_init', function(){
+    register_rest_route('wapi','/wp-announcement',array(  /*blog/2 */
+        'methods' => WP_REST_SERVER::READABLE,// wp equivalent of get
+         'callback' => 'getAnnouncement' //Error location:The handler for the route is invalid
+        
+     ));
+ });
+
+
+/////////////
+/////  GET POST
+///////
 
 function getPost($params) {
   
@@ -181,6 +268,10 @@ function getPost($params) {
   });
   
  
+/////////////
+/////  GET POSTS
+///////
+
 
  function getPosts($data) { //object of uri params
     $pageNumber = $data["id"]; //captures the parameter
