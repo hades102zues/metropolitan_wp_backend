@@ -99,7 +99,7 @@ declare(strict_types = 1);
                 'goodObject' => false
             ));
 
-            $res->set_status(410); 
+            $res->set_status(404); //NEVER USE 410 or anything else
             return  $res;
         }
 
@@ -120,7 +120,7 @@ declare(strict_types = 1);
      'goodObject' => false
  ));
 
- $res->set_status(4); 
+ $res->set_status(404); 
  return  $res;
     
   }
@@ -222,7 +222,7 @@ function getPost($params) {
                             'goodObject' => false
                         ));
         
-                        $res->set_status(410);
+                        $res->set_status(404);//NEVER USE 410 or anything else
                         
                         
                         return  $res;
