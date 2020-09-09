@@ -71,13 +71,21 @@ declare(strict_types = 1);
 
         if(strcmp($revealPost,"1")==0) {
             
-            $featuredImage = get_the_post_thumbnail_url($post->ID, 'large') ? get_the_post_thumbnail_url($post->ID, 'large') : "";
-            if(strlen($featuredImage) > 1){
-                $split1 = explode('/wp-content',$featuredImage);
-                $featuredImage = $split1[1];
-            }
+            
+            //The following is used to exchange the base automatically appended to image urls by wordpress
+            //to a target suitable for production
+            //For E.g in the default base url may be http://metropolitan-medical.local
+            //But a production ready base would be https://metropolitan-medical.com/wordpress 
+            $default_base_url = "http://metropolitan-medical.local"; 
+            $production_base_url = "http://metropolitan-medical.local";
 
-            $announcment['featured_image_url'] = $featuredImage;
+            $featuredImage = get_the_post_thumbnail_url($post->ID, 'large') ? get_the_post_thumbnail_url($post->ID, 'large') : "";
+            // if(strlen($featuredImage) > 1){
+            //     $split1 = explode('/wp-content',$featuredImage);
+            //     $featuredImage = $split1[1];
+            // }
+
+            $announcment['featured_image_url'] = str_replace($default_base_url ,$production_base_url,$featuredImage);
                
             $res = new WP_REST_Response (array(
                 'announcement' => $announcment,
@@ -173,24 +181,33 @@ function getPost($params) {
 
                     if(strcmp($revealPost,"1")==0) {
 
+                         //The following is used to exchange the base automatically appended to image urls by wordpress
+                        //to a target suitable for production
+                        //For E.g in the default base url may be http://metropolitan-medical.local
+                        //But a production ready base would be https://metropolitan-medical.com/wordpress 
+                        $default_base_url = "http://metropolitan-medical.local"; 
+                        $production_base_url = "http://metropolitan-medical.local";
+
+
                          // we use the following to get the path under wp-content
                          //this is necessary when it comes to production, where the wordpress site will not be located at root
                         $featuredImage = get_the_post_thumbnail_url($post->ID, 'medium') ? get_the_post_thumbnail_url($post->ID, 'medium') : "";
-                        if(strlen($featuredImage) > 1){
-                            $split1 = explode('/wp-content',$featuredImage);
-                            $featuredImage = $split1[1];
-                        }
+                        
+                        
+                        
+                        // if(strlen($featuredImage) > 1){
+                        //     $split1 = explode('/wp-content',$featuredImage);
+                        //     $featuredImage = $split1[1];
+                        // }
                        
                         $matchedPost["title"] = $post->post_title;
                      
                         $matchedPost["date"] = date('F m, Y', strtotime($post->post_date) );
 
                         //Must be changed in production
-                        //$matchedPost['featured_image_url'] = get_the_post_thumbnail_url($post->ID, 'medium') ? get_the_post_thumbnail_url($post->ID, 'medium') : ""; 
-                         $matchedPost['featured_image_url'] = $featuredImage; 
-
-
-                        $matchedPost["content"] = $post->post_content;
+                       
+                        $matchedPost['featured_image_url'] = str_replace($default_base_url ,$production_base_url,$featuredImage); 
+                        $matchedPost["content"] = str_replace($default_base_url ,$production_base_url,$post->post_content);
                         $matchedPost['url_cleaned_title'] = $urlReadyTitle;
                         $matchedPost["excerpt"] = $post->post_excerpt;
                         //$matchedPost["postToBeRevealed"] = true;
@@ -299,13 +316,20 @@ function getPost($params) {
         
         $urlReadyTitle = cleaned($post->post_title);
 
+        //The following is used to exchange the base automatically appended to image urls by wordpress
+        //to a target suitable for production
+        //For E.g in the default base url may be http://metropolitan-medical.local
+        //But a production ready base would be https://metropolitan-medical.com/wordpress 
+        $default_base_url = "http://metropolitan-medical.local"; 
+        $production_base_url = "http://metropolitan-medical.local";
+
         // we use the following to get the path under wp-content
         //this is necessary when it comes to production, where the wordpress site will not be located at root
         $featuredImage = get_the_post_thumbnail_url($post->ID, 'medium') ? get_the_post_thumbnail_url($post->ID, 'medium') : "";
-        if(strlen($featuredImage) > 1){
-            $split1 = explode('/wp-content',$featuredImage);
-            $featuredImage = $split1[1]; //  E.g     /uploads/20/09/ima.png
-        }
+        // if(strlen($featuredImage) > 1){
+        //     $split1 = explode('/wp-content',$featuredImage);
+        //     $featuredImage = $split1[1]; //  E.g     /uploads/20/09/ima.png
+        // }
        
          $revealPost = get_post_meta($post->ID, "show", true); //flag which determines if a post should appear on the website.
 
@@ -316,7 +340,7 @@ function getPost($params) {
                 'author' => $post->post_author,
                 'date' => date('F m, Y', strtotime($post->post_date) ),
                 'excerpt' => $post->post_excerpt,
-                 'featured_image_url' => $featuredImage,
+                 'featured_image_url' => str_replace($default_base_url ,$production_base_url,$featuredImage),
                 //'featured_image_url' => get_the_post_thumbnail_url($post->ID, 'medium') ? get_the_post_thumbnail_url($post->ID, 'medium') : "",
                 'url_cleaned_title' => $urlReadyTitle
             );
