@@ -1,1 +1,2 @@
-/wp-content
+/wp-content/**
+!/wp-content/plugins

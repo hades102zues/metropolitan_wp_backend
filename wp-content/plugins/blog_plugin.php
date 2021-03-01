@@ -35,7 +35,7 @@ declare(strict_types = 1);
         $cleanStep18 = str_replace("%","",$cleanStep17);
         $cleanStep19 = str_replace("\\","",$cleanStep18);
         $cleanStep20 = str_replace("|","",$cleanStep19);
-        $cleanStep21 = str_replace("-","",$cleanStep20);
+        $cleanStep21 = str_replace(array("-","—","——", "—-"),"",$cleanStep20);
         $cleanStep22 = str_replace("+","",$cleanStep21);
         $cleanStep23 = str_replace("_","",$cleanStep22);
         $cleanStep24 = str_replace("=","",$cleanStep23);
@@ -64,6 +64,9 @@ declare(strict_types = 1);
  
    
     $announcment = array();
+    $announcement['featured_image_url'] = "";
+    $announcement['post_url'] = "";
+    $announcement['post_uri'] = "";
 
     foreach ($posts as $post){
 
@@ -86,7 +89,9 @@ declare(strict_types = 1);
             // }
 
             $announcment['featured_image_url'] = str_replace($default_base_url ,$production_base_url,$featuredImage);
-               
+            $announcment['post_url'] = get_post_meta($post->ID, "post_url", true);
+            $announcment['post_uri'] = explode('.com', $announcment['post_url'])[1];
+            
             $res = new WP_REST_Response (array(
                 'announcement' => $announcment,
                 'goodObject' => true
@@ -101,7 +106,6 @@ declare(strict_types = 1);
         }
         else {
             //return default object
-            $announcment['featured_image_url'] = "";
             $res = new WP_REST_Response (array(
                 'announcement' => $announcment,
                 'goodObject' => false
@@ -122,7 +126,6 @@ declare(strict_types = 1);
    
     
  //return default object
- $announcment['featured_image_url'] = "";
  $res = new WP_REST_Response (array(
      'announcement' => $announcment,
      'goodObject' => false
@@ -167,6 +170,11 @@ function getPost($params) {
  
    
     $matchedPost = array();
+    $matchedPost["title"] = "";
+    $matchedPost["date"] = "";
+    $matchedPost['featured_image_url'] = ""; 
+    $matchedPost["content"] = "";
+    $matchedPost["excerpt"] = "";
  
     foreach ($posts as $post){
 
@@ -227,11 +235,7 @@ function getPost($params) {
 
                     }
                     else {
-                        $matchedPost["title"] = "";
-                        $matchedPost["date"] = "";
-                        $matchedPost['featured_image_url'] = ""; 
-                        $matchedPost["content"] = "";
-                        $matchedPost["excerpt"] = "";
+                        //set the default reponse object
                         //$matchedPost["postToBeRevealed"] = false;
 
                         $res = new WP_REST_Response (array(
@@ -253,12 +257,7 @@ function getPost($params) {
             
     }
 
-    
-    $matchedPost["title"] = "";
-    $matchedPost["date"] = "";
-    $matchedPost['featured_image_url'] = ""; 
-    $matchedPost["content"] = "";
-    $matchedPost["excerpt"] = "";
+    //set default response object
    // $matchedPost["postToBeRevealed"] = false;
 
     $res = new WP_REST_Response (array(
