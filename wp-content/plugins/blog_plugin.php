@@ -35,7 +35,7 @@ declare(strict_types = 1);
         $cleanStep18 = str_replace("%","",$cleanStep17);
         $cleanStep19 = str_replace("\\","",$cleanStep18);
         $cleanStep20 = str_replace("|","",$cleanStep19);
-        $cleanStep21 = str_replace("-","",$cleanStep20);
+        $cleanStep21 = str_replace(array("-","—","——", "—-"),"",$cleanStep20);
         $cleanStep22 = str_replace("+","",$cleanStep21);
         $cleanStep23 = str_replace("_","",$cleanStep22);
         $cleanStep24 = str_replace("=","",$cleanStep23);
